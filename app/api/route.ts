@@ -5,10 +5,7 @@ export async function POST(request: Request) {
   console.log(process.env.OPENAI_API_KEY);
   const req = await request.json();
   console.log(req);
-  const messages = [
-    { role: "system", content: "You are a helpful assistant." },
-    ...req,
-  ];
+  const messages = [...req];
 
   console.log(messages);
   // openai request
