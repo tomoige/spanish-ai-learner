@@ -34,5 +34,15 @@ export async function POST(request: Request) {
   // const buffer = Buffer.from(await mp3.arrayBuffer());
   // await fs.promises.writeFile(speechFile, buffer);
 
+  // const response = await openai.images.generate({
+  //   model: "dall-e-3",
+  //   prompt:
+  //     "",
+  //   n: 1,
+  //   size: "1024x1024",
+  // });
+
+  // console.log(response.data[0].url);
+
   return new Response(myResponse, { status: 200 });
 }

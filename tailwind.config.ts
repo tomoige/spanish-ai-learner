@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
+import Scrollbar from "tailwind-scrollbar";
 
-const colors = "#181C14#3C3D37#697565#ECDFCC";
+const colors = "#0D0D0D#1F1F2E#5b5bff#F92672";
 
 export default {
   content: [
@@ -18,5 +19,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwind-scrollbar")],
+  plugins: [Scrollbar],
 } satisfies Config;

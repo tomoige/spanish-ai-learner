@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import systemPrompts from "../lib/systemPrompts";
 import Dictaphone from "@/components/Dictaphone";
+import BeatLoader from "react-spinners/BeatLoader";
 
 interface chat {
   role: string;
@@ -14,10 +15,13 @@ interface chat {
 export default function Home() {
   const [messages, setMessages] = useState<chat[]>([]);
   const [input, setInput] = useState("");
+  const [lastMessage, setLastMessage] = useState("");
   const [type, setType] = useState("");
+  const [sending, setSending] = useState(true);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLastMessage(input);
     setInput("");
     const res = await fetch("/api", {
       method: "POST",
@@ -25,7 +29,7 @@ export default function Home() {
     });
     const data = await res.json();
     setMessages(data);
-    console.log(data);
+    setSending(false);
   };
 
   const handleChange = async (e: React.FormEvent<HTMLInputElement>) => {
@@ -36,6 +40,7 @@ export default function Home() {
 
   const startChat = async (chatType: string) => {
     setType(chatType);
+
     let res;
     if (chatType == "Debate") {
       res = await fetch("/api", {
@@ -68,21 +73,32 @@ export default function Home() {
     if (res != undefined) {
       const data = await res.json();
       setMessages(data);
+      setSending(false);
       console.log(data);
     }
   };
+
+  useEffect(() => {
+    const objDiv = document.getElementById("chat-box");
+
+    if (objDiv != null) {
+      objDiv.scrollTop = objDiv.scrollHeight;
+    }
+  }, [messages, sending]);
 
   if (type.length == 0) {
     return (
       <div className="flex-auto p-8">
         <div className="flex flex-col items-center">
-          <span className="text-lg">What would you like to talk about?</span>
+          <span className="text-2xl text-white">
+            What would you like to talk about?
+          </span>
           <div className="flex">
             {["Debate", "Chat", "Roleplay"].map((type, i) => {
               return (
                 <div
                   key={i}
-                  className="border-black bg-blue-50 border-sm w-[100px] hover:cursor-pointer m-4 p-4"
+                  className="bg-three hover:bg-three/80 rounded-md w-[100px] hover:cursor-pointer text-white m-4 p-4"
                   onClick={() => startChat(type)}
                 >
                   <p className="text-center">{type}</p>
@@ -98,7 +114,10 @@ export default function Home() {
   return (
     <div className="flex-auto">
       <div className="p-8 m-auto max-h-screen h-screen flex flex-col">
-        <div className="flex-auto scrollbar scrollbar-thumb-three scrollbar-track-one  overflow-y-scroll">
+        <div
+          id="chat-box"
+          className="flex-auto scrollbar scrollbar-thumb-three scrollbar-track-one  overflow-y-scroll"
+        >
           {messages.map((message, i) => {
             if (message.role == "system") {
               return;
@@ -106,7 +125,7 @@ export default function Home() {
             return (
               <div
                 key={i}
-                className={`m-4 p-4 rounded-md max-w-[50%] ${
+                className={`text-white m-4 p-4 rounded-md max-w-[50%] ${
                   message.role == "assistant"
                     ? "bg-three text-white"
                     : "bg-four ml-auto"
@@ -120,9 +139,33 @@ export default function Home() {
               </div>
             );
           })}
+          {sending &&
+            (sending && lastMessage.length > 0 ? (
+              <>
+                <div
+                  className={`text-white m-4 p-4 rounded-md max-w-[50%] bg-four ml-auto`}
+                >
+                  <div className="markdown">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {lastMessage}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+                <BeatLoader color={"#5b5bff"} />
+              </>
+            ) : (
+              <BeatLoader color={"#5b5bff"} />
+            ))}
         </div>
+
         <div className="flex w-full items-center bg-white rounded-md">
-          <form className="flex-auto" onSubmit={(e) => handleSubmit(e)}>
+          <form
+            className="flex-auto"
+            onSubmit={(e) => {
+              setSending(true);
+              handleSubmit(e);
+            }}
+          >
             <input
               className="w-full bg-white rounded-md p-4 focus:outline-none"
               placeholder="Type something"
