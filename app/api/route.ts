@@ -1,15 +1,12 @@
 import OpenAI from "openai";
-import fs from "fs";
-import path from "path";
+import { quizPrompt } from "../lib/systemPrompts";
+
 const openai = new OpenAI();
 
-export async function POST(request: Request) {
-  console.log(process.env.OPENAI_API_KEY);
-  const req = await request.json();
-  console.log(req);
-  const messages = [...req];
+export async function GET() {
+  // const req = await request.json();
+  const messages = [{ role: "system", content: quizPrompt }];
 
-  console.log(messages);
   // openai request
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
@@ -17,32 +14,23 @@ export async function POST(request: Request) {
   });
 
   messages.push(completion.choices[0].message);
-  console.log(messages);
   const myResponse = JSON.stringify(messages);
 
-  // const speechFile = path.resolve("./speech.mp3");
+  return new Response(myResponse, { status: 200 });
+}
 
-  // const mp3 = await openai.audio.speech.create({
-  //   model: "tts-1",
-  //   voice: "alloy",
-  //   input:
-  //     completion.choices[0].message.content == null
-  //       ? ""
-  //       : completion.choices[0].message.content,
-  // });
+export async function POST(request: Request) {
+  const req = await request.json();
+  const messages = [...req];
 
-  // const buffer = Buffer.from(await mp3.arrayBuffer());
-  // await fs.promises.writeFile(speechFile, buffer);
+  // openai request
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: messages,
+  });
 
-  // const response = await openai.images.generate({
-  //   model: "dall-e-3",
-  //   prompt:
-  //     "",
-  //   n: 1,
-  //   size: "1024x1024",
-  // });
-
-  // console.log(response.data[0].url);
+  messages.push(completion.choices[0].message);
+  const myResponse = JSON.stringify(messages);
 
   return new Response(myResponse, { status: 200 });
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { IoChatboxOutline } from "react-icons/io5";
+import { FaQuestion } from "react-icons/fa";
 
 interface NavbarItemType {
   link: string;
@@ -30,6 +31,7 @@ function Navbar() {
             icon={<IoChatboxOutline />}
             label="AI Chat"
           />
+          <NavbarItem link={"/quiz"} icon={<FaQuestion />} label="Word Quiz" />
         </div>
       </div>
       <div className="flex flex-col items-center gap-2">

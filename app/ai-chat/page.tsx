@@ -69,6 +69,15 @@ export default function Home() {
         ]),
       });
     }
+    if (chatType == "Translation") {
+      res = await fetch("/api", {
+        method: "POST",
+        body: JSON.stringify([
+          { role: "system", content: systemPrompts[chatType] },
+          ...messages,
+        ]),
+      });
+    }
 
     if (res != undefined) {
       const data = await res.json();
@@ -94,11 +103,11 @@ export default function Home() {
             What would you like to talk about?
           </span>
           <div className="flex">
-            {["Debate", "Chat", "Roleplay"].map((type, i) => {
+            {["Debate", "Chat", "Roleplay", "Translation"].map((type, i) => {
               return (
                 <div
                   key={i}
-                  className="bg-three hover:bg-three/80 rounded-md w-[100px] hover:cursor-pointer text-white m-4 p-4"
+                  className="bg-three hover:bg-three/80 rounded-md w-[120px] hover:cursor-pointer text-white m-4 p-4"
                   onClick={() => startChat(type)}
                 >
                   <p className="text-center">{type}</p>
