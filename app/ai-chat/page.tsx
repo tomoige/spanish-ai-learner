@@ -18,6 +18,7 @@ export default function Home() {
   const [lastMessage, setLastMessage] = useState("");
   const [type, setType] = useState("");
   const [sending, setSending] = useState(true);
+  const [reasoning, setReasoning] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,7 +26,10 @@ export default function Home() {
     setInput("");
     const res = await fetch("/api", {
       method: "POST",
-      body: JSON.stringify([...messages, { role: "user", content: input }]),
+      body: JSON.stringify({
+        messages: [...messages, { role: "user", content: input }],
+        reasoning: reasoning,
+      }),
     });
     const data = await res.json();
     setMessages(data);
@@ -45,37 +49,49 @@ export default function Home() {
     if (chatType == "Debate") {
       res = await fetch("/api", {
         method: "POST",
-        body: JSON.stringify([
-          { role: "system", content: systemPrompts[chatType] },
-          ...messages,
-        ]),
+        body: JSON.stringify({
+          messages: [
+            { role: "user", content: systemPrompts[chatType] },
+            ...messages,
+          ],
+          reasoning: reasoning,
+        }),
       });
     }
     if (chatType == "Chat") {
       res = await fetch("/api", {
         method: "POST",
-        body: JSON.stringify([
-          { role: "system", content: systemPrompts[chatType] },
-          ...messages,
-        ]),
+        body: JSON.stringify({
+          messages: [
+            { role: "user", content: systemPrompts[chatType] },
+            ...messages,
+          ],
+          reasoning: reasoning,
+        }),
       });
     }
     if (chatType == "Roleplay") {
       res = await fetch("/api", {
         method: "POST",
-        body: JSON.stringify([
-          { role: "system", content: systemPrompts[chatType] },
-          ...messages,
-        ]),
+        body: JSON.stringify({
+          messages: [
+            { role: "user", content: systemPrompts[chatType] },
+            ...messages,
+          ],
+          reasoning: reasoning,
+        }),
       });
     }
     if (chatType == "Translation") {
       res = await fetch("/api", {
         method: "POST",
-        body: JSON.stringify([
-          { role: "system", content: systemPrompts[chatType] },
-          ...messages,
-        ]),
+        body: JSON.stringify({
+          messages: [
+            { role: "user", content: systemPrompts[chatType] },
+            ...messages,
+          ],
+          reasoning: reasoning,
+        }),
       });
     }
 
@@ -97,17 +113,17 @@ export default function Home() {
 
   if (type.length == 0) {
     return (
-      <div className="flex-auto p-8">
+      <div className="flex-auto p-8 bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center">
-          <span className="text-2xl text-white">
+          <span className="text-3xl mb-6">
             What would you like to talk about?
           </span>
-          <div className="flex">
+          <div className="flex space-x-4">
             {["Debate", "Chat", "Roleplay", "Translation"].map((type, i) => {
               return (
                 <div
                   key={i}
-                  className="bg-three hover:bg-three/80 rounded-md w-[120px] hover:cursor-pointer text-white m-4 p-4"
+                  className="bg-three hover:bg-three/80 rounded-lg w-[140px] hover:cursor-pointer text-white p-4 shadow-lg transition-transform transform hover:scale-105"
                   onClick={() => startChat(type)}
                 >
                   <p className="text-center">{type}</p>
@@ -121,13 +137,16 @@ export default function Home() {
   }
 
   return (
-    <div className="flex-auto">
+    <div className="flex-auto bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white min-h-screen">
       <div className="p-8 m-auto max-h-screen h-screen flex flex-col">
         <div
           id="chat-box"
-          className="flex-auto scrollbar scrollbar-thumb-three scrollbar-track-one  overflow-y-scroll"
+          className="flex-auto scrollbar scrollbar-thumb-three scrollbar-track-one overflow-y-scroll"
         >
           {messages.map((message, i) => {
+            if (i == 0) {
+              return;
+            }
             if (message.role == "system") {
               return;
             }
@@ -167,7 +186,7 @@ export default function Home() {
             ))}
         </div>
 
-        <div className="flex w-full items-center bg-white rounded-md">
+        <div className="flex w-full items-center bg-white rounded-md mt-4">
           <form
             className="flex-auto"
             onSubmit={(e) => {
@@ -176,7 +195,7 @@ export default function Home() {
             }}
           >
             <input
-              className="w-full bg-white rounded-md p-4 focus:outline-none"
+              className="w-full bg-white text-black rounded-md p-4 focus:outline-none"
               placeholder="Type something"
               type="text"
               onChange={(e) => handleChange(e)}
@@ -186,6 +205,18 @@ export default function Home() {
           <div className="relative top-1 right-2">
             <Dictaphone onInput={setInput} />
           </div>
+        </div>
+        <div>
+          <button
+            className={`${
+              reasoning ? "bg-four" : "bg-four/50"
+            } p-2 rounded-md mt-2`}
+            onClick={() => {
+              setReasoning((prev) => !prev);
+            }}
+          >
+            Reasoning
+          </button>
         </div>
       </div>
     </div>

@@ -23,7 +23,7 @@ function Navbar() {
     <div className="flex flex-col justify-between p-6 h-screen bg-one text-white shrink-0">
       <div>
         <Link href="/">
-          <h1 className="text-lg">Language Learning</h1>
+          <h1 className="text-lg text-center">Chat IA</h1>
         </Link>
         <div className="flex flex-col mt-4">
           <NavbarItem
